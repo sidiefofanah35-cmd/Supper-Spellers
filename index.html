@@ -21,26 +21,26 @@
       z-index: 1000;
     }
     header img {
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       vertical-align: middle;
       margin-right: 15px;
     }
     header h1 {
       margin: 5px 0;
-      font-size: 28px;
+      font-size: 50px;
     }
     header h2 {
       margin: 3px 0;
-      font-size: 20px;
+      font-size: 30px;
       color: #ffeb3b;
     }
 
     /* Big Word Box */
     #bigWordBox {
       text-align: center;
-      font-size: 28px;
+      font-size: 50px;
       font-weight: bold;
       margin: 20px auto;
       padding: 20px;
@@ -67,18 +67,18 @@
 
     #main {
       flex: 1;
-      padding: 20px;
+      padding: 15px;
       background: #f9fbfd;
     }
 
     /* Student search */
     #studentSearch {
-      width: 100%;
+      width: 80%;
       padding: 8px 12px;
       margin-bottom: 15px;
       border: 2px solid #004080;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 18px;
     }
 
     /* Students list */
@@ -108,7 +108,7 @@
 
     /* Buttons */
     button {
-      padding: 10px 15px;
+      padding: 20px 28px;
       border: none;
       border-radius: 8px;
       margin: 5px;
@@ -151,9 +151,9 @@
   <!-- Header -->
   <header>
     <img src="schoollogo.jpg" alt="School Logo">
-    <h2>ARK OF HOPE MODERN ACADEMY</h2>
-    <h3>SUPER SPELLERS 2025/2026</h3>
-    <h3> ROUND TWO</h3>
+    <h1>ARK OF HOPE MODERN ACADEMY</h1>
+    <h2>SUPER SPELLERS 2025/2026</h2>
+    <h2> ROUND TWO</h2>
   </header>
 
   <!-- Big word display -->
@@ -181,6 +181,7 @@
 
       <h3>Leaderboard</h3>
       <button class="btn-review" onclick="showLeaderboard()">Review Grades</button>
+      <h2>RESULT</h2>
       <ul id="leaderboard"></ul>
     </div>
   </div>
@@ -202,8 +203,8 @@ let words = {
 
 // --- Preloaded students ---
 let students = [
-  {name: "Alice", score: 0},
-  {name: "Bob", score: 0},
+  {name: "Sidie Fofanah", score: 0},
+  {name: "Peter Amara Fortune", score: 0},
   {name: "Charlie", score: 0},
   {name: "David", score: 0},
   {name: "Evelyn", score: 0},
@@ -300,7 +301,7 @@ function showLeaderboard() {
   sorted.forEach((s,i) => {
     let li = document.createElement("li");
     li.innerText = `${i+1}. ${s.name} - ${s.score}`;
-    li.className = i >= sorted.length-2 ? "relegation" : "safe";
+    li.className = i >= sorted.length-4 ? "relegation" : "safe";
     lb.appendChild(li);
   });
 }
