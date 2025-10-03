@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Super Speller Competition</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f8fa;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      background: #004080;
+      color: white;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 15px;
+    }
+    header h1 {
+      margin: 5px 0;
+      font-size: 28px;
+    }
+    header h2 {
+      margin: 3px 0;
+      font-size: 20px;
+      color: #ffeb3b;
+    }
+
+    /* Big Word Box */
+    #bigWordBox {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin: 20px auto;
+      padding: 20px;
+      border: 3px solid #004080;
+      border-radius: 12px;
+      width: 60%;
+      background: #ffffff;
+      color: #333;
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+      height: calc(100vh - 200px);
+    }
+
+    #students {
+      width: 30%;
+      border-right: 2px solid #ccc;
+      padding: 20px;
+      background: #fff;
+      overflow-y: auto;
+    }
+
+    #main {
+      flex: 1;
+      padding: 20px;
+      background: #f9fbfd;
+    }
+
+    /* Student search */
+    #studentSearch {
+      width: 100%;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border: 2px solid #004080;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    /* Students list */
+    #studentList {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    #studentList li {
+      background: #e3f2fd;
+      padding: 10px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: bold;
+    }
+    #studentList li:hover {
+      background: #90caf9;
+    }
+    #studentList li.active {
+      background: #1565c0;
+      color: white;
+    }
+
+    /* Buttons */
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      margin: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .btn-correct { background: #4caf50; color: white; }
+    .btn-wrong { background: #f44336; color: white; }
+    .btn-review { background: #2196f3; color: white; }
+    .btn-undo { background: #ff9800; color: white; }
+
+    /* Leaderboard */
+    #leaderboard {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+    #leaderboard li {
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .relegation {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .safe {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <img src="schoollogo.jpg" alt="School Logo">
+    <h2>ARK OF HOPE MODERN ACADEMY</h2>
+    <h3>SUPER SPELLERS 2025/2026</h3>
+    <h3> ROUND TWO</h3>
+  </header>
+
+  <!-- Big word display -->
+  <div id="bigWordBox">Pick a number to display the spelling here</div>
+
+  <div class="container">
+    <!-- Students Panel -->
+    <div id="students">
+      <h3>Students</h3>
+      <input type="text" id="studentSearch" placeholder="Search student..." onkeyup="filterStudents()">
+      <ul id="studentList"></ul>
+    </div>
+
+    <!-- Main Panel -->
+    <div id="main">
+      <h2>Word Lookup</h2>
+      <input type="number" id="wordNumber" placeholder="Enter number">
+      <button onclick="lookupWord()">Find Word</button>
+
+      <div>
+        <button class="btn-correct" onclick="markResult(true)">✅ Correct</button>
+        <button class="btn-wrong" onclick="markResult(false)">❌ Wrong</button>
+        <button class="btn-undo" onclick="undoResult()">↩ Undo</button>
+      </div>
+
+      <h3>Leaderboard</h3>
+      <button class="btn-review" onclick="showLeaderboard()">Review Grades</button>
+      <ul id="leaderboard"></ul>
+    </div>
+  </div>
+
+<script>
+// --- Words bank (10 spellings) ---
+let words = {
+  1: "accommodate",
+  2: "rhythm",
+  3: "occurrence",
+  4: "miscellaneous",
+  5: "pronunciation",
+  6: "bureaucracy",
+  7: "entrepreneur",
+  8: "conscience",
+  9: "phenomenon",
+  10: "supersede"
+};
+
+// --- Preloaded students ---
+let students = [
+  {name: "Alice", score: 0},
+  {name: "Bob", score: 0},
+  {name: "Charlie", score: 0},
+  {name: "David", score: 0},
+  {name: "Evelyn", score: 0},
+  {name: "Frank", score: 0},
+  {name: "Grace", score: 0},
+  {name: "Hannah", score: 0},
+  {name: "Isaac", score: 0},
+  {name: "Julia", score: 0},
+  {name: "Kevin", score: 0},
+  {name: "Linda", score: 0},
+  {name: "Michael", score: 0},
+  {name: "Nancy", score: 0},
+  {name: "Oscar", score: 0},
+  {name: "Paul", score: 0},
+  {name: "Queen", score: 0},
+  {name: "Robert", score: 0},
+  {name: "Sarah", score: 0},
+  {name: "Tom", score: 0}
+];
+
+let currentStudent = null;
+let lastAction = null;
+
+// Render students
+function renderStudents(filter="") {
+  let list = document.getElementById("studentList");
+  list.innerHTML = "";
+  students.forEach((s, i) => {
+    if (s.name.toLowerCase().includes(filter.toLowerCase())) {
+      let li = document.createElement("li");
+      li.innerText = s.name + " (" + s.score + ")";
+      li.onclick = () => {
+        currentStudent = i;
+        highlightSelected(i);
+      };
+      if (i === currentStudent) li.classList.add("active");
+      list.appendChild(li);
+    }
+  });
+}
+
+// Highlight selected student
+function highlightSelected(index) {
+  let items = document.querySelectorAll("#studentList li");
+  items.forEach((li, i) => {
+    li.classList.toggle("active", li.innerText.startsWith(students[index].name));
+  });
+}
+
+// Filter students
+function filterStudents() {
+  let search = document.getElementById("studentSearch").value;
+  renderStudents(search);
+}
+
+// Lookup word
+function lookupWord() {
+  let num = document.getElementById("wordNumber").value;
+  let word = words[num] || "Not found";
+  document.getElementById("bigWordBox").innerText = num ? `${num}. ${word}` : "Not found";
+}
+
+// Mark result
+function markResult(correct) {
+  if (currentStudent === null) { alert("Select a student first"); return; }
+  let student = students[currentStudent];
+  if (correct) {
+    student.score++;
+    lastAction = {studentIndex: currentStudent, type: "add"};
+  } else {
+    lastAction = {studentIndex: currentStudent, type: "wrong"};
+  }
+  renderStudents(document.getElementById("studentSearch").value);
+  highlightSelected(currentStudent);
+}
+
+// Undo last action
+function undoResult() {
+  if (!lastAction) { alert("No action to undo"); return; }
+  let student = students[lastAction.studentIndex];
+  if (lastAction.type === "add") {
+    student.score--;
+  }
+  lastAction = null;
+  renderStudents(document.getElementById("studentSearch").value);
+  highlightSelected(currentStudent);
+}
+
+// Show leaderboard
+function showLeaderboard() {
+  let lb = document.getElementById("leaderboard");
+  lb.innerHTML = "";
+  let sorted = [...students].sort((a,b) => b.score - a.score);
+  sorted.forEach((s,i) => {
+    let li = document.createElement("li");
+    li.innerText = `${i+1}. ${s.name} - ${s.score}`;
+    li.className = i >= sorted.length-2 ? "relegation" : "safe";
+    lb.appendChild(li);
+  });
+}
+
+// Initial render
+renderStudents();
+</script>
+</body>
+</html>
