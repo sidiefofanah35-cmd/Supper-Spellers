@@ -332,19 +332,24 @@ function undoResult() {
   highlightSelected(currentStudent);
 }
 
-// Show leaderboard
-function showLeaderboard() {
+// Toggle leaderboard
+function toggleLeaderboard() {
   let lb = document.getElementById("leaderboard");
-  lb.innerHTML = "";
-  let sorted = [...students].sort((a,b) => b.score - a.score);
-  sorted.forEach((s,i) => {
-    let li = document.createElement("li");
-    li.innerText = `${i+1}. ${s.name} - ${s.score}`;
-    li.className = i >= sorted.length-4 ? "relegation" : "safe";
-    lb.appendChild(li);
-  });
+  if (!leaderboardVisible) {
+    lb.innerHTML = "";
+    let sorted = [...students].sort((a,b) => b.score - a.score);
+    sorted.forEach((s,i) => {
+      let li = document.createElement("li");
+      li.innerText = `${i+1}. ${s.name} - ${s.score}`;
+      li.className = i >= sorted.length-2 ? "relegation" : "safe";
+      lb.appendChild(li);
+    });
+    leaderboardVisible = true;
+  } else {
+    lb.innerHTML = "";
+    leaderboardVisible = false;
+  }
 }
-
 // Initial render
 renderStudents();
 </script>
