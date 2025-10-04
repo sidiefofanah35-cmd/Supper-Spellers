@@ -332,6 +332,321 @@ function undoResult() {
   highlightSelected(currentStudent);
 }
 
+// Show leaderboard
+function showLeaderboard() {
+  let lb = document.getElementById("leaderboard");
+  lb.innerHTML = "";
+  let sorted = [...students].sort((a,b) => b.score - a.score);
+  sorted.forEach((s,i) => {
+    let li = document.createElement("li");
+    li.innerText = `${i+1}. ${s.name} - ${s.score}`;
+    li.className = i >= sorted.length-4 ? "relegation" : "safe";
+    lb.appendChild(li);
+  });
+}
+
+// Initial render
+renderStudents();
+</script>
+</body>
+</html>      color: #ffeb3b;
+    }
+
+    /* Big Word Box */
+    #bigWordBox {
+      text-align: center;
+      font-size: 90px;
+      font-weight: bold;
+      margin: 20px auto;
+      padding: 20px;
+      border: 3px solid #004080;
+      border-radius: 12px;
+      width: 60%;
+      background: #ffffff;
+      color: #333;
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+      height: calc(100vh - 200px);
+    }
+
+    #students {
+      width: 30%;
+      border-right: 2px solid #ccc;
+      padding: 20px;
+      background: #fff;
+      overflow-y: auto;
+    }
+
+    #main {
+      flex: 1;
+      padding: 15px;
+      background: #f9fbfd;
+    }
+
+    /* Student search */
+    #studentSearch {
+      width: 80%;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border: 2px solid #004080;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+
+    /* Students list */
+    #studentList {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    #studentList li {
+      background: #e3f2fd;
+      padding: 10px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: bold;
+    }
+    #studentList li:hover {
+      background: #90caf9;
+    }
+    #studentList li.active {
+      background: #1565c0;
+      color: white;
+    }
+
+    /* Buttons */
+    button {
+      padding: 20px 28px;
+      border: none;
+      border-radius: 8px;
+      margin: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .btn-correct { background: #4caf50; color: white; }
+    .btn-wrong { background: #f44336; color: white; }
+    .btn-review { background: #2196f3; color: white; }
+    .btn-undo { background: #ff9800; color: white; }
+
+    /* Leaderboard */
+    #leaderboard {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+    #leaderboard li {
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .relegation {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .safe {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <img src="schoollogo.jpg" alt="School Logo">
+    <h1>ARK OF HOPE MODERN ACADEMY</h1>
+    <h2>SUPER SPELLERS 2025/2026 ACADEMIC YEAR</h2>
+    <h2> ROUND TWO</h2>
+  </header>
+
+  <!-- Big word display -->
+  <div id="bigWordBox">Spelling Display</div>
+
+  <div class="container">
+    <!-- Students Panel -->
+    <div id="students">
+      <h3>Students</h3>
+      <input type="text" id="studentSearch" placeholder="Search student..." onkeyup="filterStudents()">
+      <ul id="studentList"></ul>
+    </div>
+
+    <!-- Main Panel -->
+    <div id="main">
+      <h2>Word Lookup</h2>
+      <input type="number" id="wordNumber" placeholder="Enter number">
+      <button onclick="lookupWord()">Find Word</button>
+
+      <div>
+        <button class="btn-correct" onclick="markResult(true)">✅ Correct</button>
+        <button class="btn-wrong" onclick="markResult(false)">❌ Wrong</button>
+        <button class="btn-undo" onclick="undoResult()">↩ Undo</button>
+      </div>
+
+      <h3>Leaderboard</h3>
+      <button class="btn-review" onclick="showLeaderboard()">Review Grades</button>
+      <h2>RESULT</h2>
+      <ul id="leaderboard"></ul>
+    </div>
+  </div>
+
+<script>
+// --- Words bank (10 spellings) ---
+let words = [
+  "Absolute","Abstract","Academic","Accusing","Accurate","Activity","Addition","Advanced","Advocate","Affected",
+  "Aircraft","Allergen","Alphabet","Ambition","Analysis","Announce","Anxiety","Anything","Anytime","Apparent",
+  "Approach","Aqueduct","Arsenals","Assembly","Athletic","Atlantic","Atrocity","Audience","Aviation","Backward",
+  "Ballroom","Baseball","Basement","Baseline","Beehives","Behavior","Belmonts","Benefits","Beverage","Birthday",
+  "Blueprint","Boundary","Bravery","Brilliant","Building","Bulletin","Business","Butterfly","Calendar","Campaign",
+  "Capacity","Capture","Caravan","Careless","Carriage","Category","Celebrate","Cemented","Censored","Chaining",
+  "Champion","Changing","Channels","Checkout","Chemical","Children","Clapping","Climbers","Clothing","Coalition",
+  "Coastal","Collapse","Collects","Comforts","Commands","Commerce","Complain","Compose","Compute","Conclude",
+  "Concrete","Confetti","Confirms","Conserve","Consider","Constant","Contains","Continue","Contract","Controls",
+  "Converts","Conveyed","Convince","Cookies","Corrects","Costumes","Creation","Creative","Credible","Critical",
+  "Crowning","Cultural","Customer","Cylinder","Database","Daughter","Deadline","Deciding","Decision","Declare",
+  "Decrease","Defender","Delivery","Delusion","Density","Depends","Describe","Designer","Detached","Detailed",
+  "Dialogue","Diameter","Digested","Dilution","Directed","Discover","Disorder","Distance","Distinct","District",
+  "Dividend","Dominant","Dramatic","Duration","Dynamite","Earning","Economic","Educator","Eighthly","Elevator",
+  "Eligible","Emeralds","Employee","Enclosing","Endanger","Endorse","Engaging","Engineer","Enjoying","Enormous",
+  "Ensemble","Entirely","Entrance","Episode","Equality","Equation","Erosion","Escaping","Essence","Estimate",
+  "Evaluate","Evidence","Exampled","Excluded","Exercise","Explicit","External","Eyeglass","Fallback","Familiar",
+  "Fantasy","Fascicle","Fatefuls","Favorite","Feedback","Festival","Fidelity","Finallys","Finished","Flagpole",
+  "Flexible","Floating","Flowerss","Foremost","Formulae","Fortunes","Forward","Founder","Fracture","Freedom",
+  "Frequent","Friendly","Friction","Frontier","Frugally","Function","Furthest","Galleries","Gamblets","Gangways",
+  "Gardener","Gateway","Generous","Genesis","Genuine","Geometry","Gesture","Glacier","Goodness","Gorgeous",
+  "Governed","Graduate","Grammar","Graphite","Grasshop","Greatest","Greeting","Gripping","Grumbled","Guidance",
+  "Habitat","Hairpins","Handball","Handpick","Handrail","Happiest","Hardness","Harvests","Headache","Headline",
+  "Healthy","Hearing","Heartses","Heights","Heritage","Herselfs","Highway","Historic","Holidays","Hospital",
+  "Humanity","Humorous","Identity","Imagined","Impaired","Implicit","Improvee","Informed","Injuries","Innocent",
+  "Inquiry","Insiders","Instance","Integral","Interest","Interior","Internet","Interval","Invasion","Involved",
+  "Isolated","Jewelrys","Judgment","Juicings","Junction","Keyboard","Kickoffs","Kindness","Kitcheny","Kneeling",
+  "Knowledge","Landlord","Language","Laughter","Learning","Leather","Lecturer","Leftward","Lifetime","Lighting",
+  "Literacy","Location","Luggagee","Magnetic","Majority","Mandates","Marginal","Marriage","Material","Medicine",
+  "Memorial","Merchant","Messagee","Midnight","Military","Minister","Mobility","Modeling","Modified","Monarchy",
+  "Monetary","Monitors","Mountain","Movement","Multiple","Musicale","National","Necklace","Negative","Notebook",
+  "November","Numericc","Observer","Occasion","Occupied","Offshore","Operator","Opinions","Opponent","Optional",
+  "Orchards","Ordinary","Outreach","Overcome","Overload","Overlook","Painting","Parallel","Patience","Patterns",
+  "Payrolls","Peaceful","Pendanty","Perceive","Personal","Pharmacy","Physical","Platform","Pleasure","Policies",
+  "Politics","Portable","Position","Positive","Powerful","Practice","Prepared","Presence","Pressure","Previous",
+  "Printers","Priority","Producer","Progress","Property","Province","Provided","Publicly","Purchase","Pursuing",
+  "Quantity","Question","Radiator","Rainfall","Reaction","Readings","Realized","Recorder","Recovery","Regional",
+  "Relation","Relative","Relevant","Religion","Remember","Republic","Required","Research","Resident","Response",
+  "Restrict","Revealed","Revision","Revolved","Richness","Riverses","Romantic","Rotating","Routines","Rulership",
+  "Running","Sanction","Sandboxs","Saturday","Sceneryy","Scholars","Scissors","Seasonal","Security","Sentence",
+  "Separate","Services","Settings","Shipping","Shortcut","Sidewalk","Signaled","Simplify","Situation","Sleeping",
+  "Software","Soldiers","Solution","Speaking","Specific","Spectrum","Spiritual","Sporting","Standard","Stations",
+  "Strategy","Strength","Stressed","Struggle","Students","Suburban","Suitable","Sunlight","Superior","Survival",
+  "Swelling","Swimming","Synonyms","Tailored","Tendency","Terminal","Thinking","Thorough","Thousand","Training",
+  "Transfer","Transitn","Traveled","Treasury","Triangle","Triumphs","Trustees","Tutorial","Ultimate","Umbrella",
+  "Uncovers","Underway","Unequaled","Unifying","Uniforms","Unitings","Universal","Upgrades","Uprights","Urgency",
+  "Vacation","Validity","Valuable","Variable","Vertical","Vineyard","Violence","Visitorr","Vitamins","Volcanic",
+  "Vulnerab","Wandered","Warningg","Warriorr","Weakness","Weddings","Weekends","Welfaree","Whatever","Whenever",
+  "Wherever","Wildfire","Wildlifee","Wireless","Wishlist","Withdraw","Witnesss","Workerss","Worrying","Writings"
+];
+
+// --- Preloaded students ---
+let students = [
+  {name: "Sidie Fofanah", score: 0},
+  {name: "Peter Amara Fortune", score: 0},
+  {name: "Charlie", score: 0},
+  {name: "David", score: 0},
+  {name: "Evelyn", score: 0},
+  {name: "Frank", score: 0},
+  {name: "Grace", score: 0},
+  {name: "Hannah", score: 0},
+  {name: "Isaac", score: 0},
+  {name: "Julia", score: 0},
+  {name: "Kevin", score: 0},
+  {name: "Linda", score: 0},
+  {name: "Michael", score: 0},
+  {name: "Nancy", score: 0},
+  {name: "Oscar", score: 0},
+  {name: "Paul", score: 0},
+  {name: "Queen", score: 0},
+  {name: "Robert", score: 0},
+  {name: "Sarah", score: 0},
+  {name: "Tom", score: 0}
+];
+
+let currentStudent = null;
+let lastAction = null;
+
+// Render students
+function renderStudents(filter="") {
+  let list = document.getElementById("studentList");
+  list.innerHTML = "";
+  students.forEach((s, i) => {
+    if (s.name.toLowerCase().includes(filter.toLowerCase())) {
+      let li = document.createElement("li");
+      li.innerText = s.name + " (" + s.score + ")";
+      li.onclick = () => {
+        currentStudent = i;
+        highlightSelected(i);
+      };
+      if (i === currentStudent) li.classList.add("active");
+      list.appendChild(li);
+    }
+  });
+}
+
+// Highlight selected student
+function highlightSelected(index) {
+  let items = document.querySelectorAll("#studentList li");
+  items.forEach((li, i) => {
+    li.classList.toggle("active", li.innerText.startsWith(students[index].name));
+  });
+}
+
+// Filter students
+function filterStudents() {
+  let search = document.getElementById("studentSearch").value;
+  renderStudents(search);
+}
+
+// Lookup word
+function lookupWord() {
+  let num = document.getElementById("wordNumber").value;
+  let word = words[num] || "Not found";
+  document.getElementById("bigWordBox").innerText = num ? `${num}. ${word}` : "Not found";
+}
+
+// Mark result
+function markResult(correct) {
+  if (currentStudent === null) { alert("Select a student first"); return; }
+  let student = students[currentStudent];
+  if (correct) {
+    student.score++;
+    lastAction = {studentIndex: currentStudent, type: "add"};
+  } else {
+    lastAction = {studentIndex: currentStudent, type: "wrong"};
+  }
+  renderStudents(document.getElementById("studentSearch").value);
+  highlightSelected(currentStudent);
+}
+
+// Undo last action
+function undoResult() {
+  if (!lastAction) { alert("No action to undo"); return; }
+  let student = students[lastAction.studentIndex];
+  if (lastAction.type === "add") {
+    student.score--;
+  }
+  lastAction = null;
+  renderStudents(document.getElementById("studentSearch").value);
+  highlightSelected(currentStudent);
+}
+
 // Toggle leaderboard
 function toggleLeaderboard() {
   let lb = document.getElementById("leaderboard");
